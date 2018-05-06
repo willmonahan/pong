@@ -1,7 +1,7 @@
 var wallWidth = 20;
 var ballSize = 20;
 var paddleWidth = 16;
-var paddleHeight = 100;
+var paddleHeight;
 var totalSpeed = 5;
 var ball;
 var paddles = []; //array of paddles
@@ -24,7 +24,8 @@ function preload() { //preload the image
 }
 
 function setup() {
-	createCanvas(800,600);
+	createCanvas(windowWidth,windowHeight);
+	paddleHeight = height/5;
 	noStroke();
 	ellipseMode(CENTER);
 	rectMode(CENTER);
@@ -72,11 +73,13 @@ class Ball {
 		//collision for left paddle
 		if (this.x - this.size / 2 < paddleWidth && this.y > paddles[0].y - paddleHeight / 2 && this.y < paddles[0].y + paddleHeight / 2) {
 			this.speedX *= -1;
+			this.x = paddleWidth + this.size / 2;
 		}
 
-		//collision for left paddle
+		//collision for right paddle
 		if (this.x + this.size / 2 > width - paddleWidth && this.y > paddles[1].y - paddleHeight / 2 && this.y < paddles[1].y + paddleHeight / 2) {
 			this.speedX *= -1;
+			this.x = width - paddleWidth - this.size / 2;
 		}
 	}
 
@@ -115,20 +118,28 @@ class Paddle {
 		rect(this.x, this.y, paddleWidth, paddleHeight);
 
 		switch (this.mode) {
-			case 0:
-				if (ball.y < this.y) {
+			case 1:
+				if (keyIsDown(87)) {
 					this.speed -= accel;
 				}
-				if (ball.y > this.y) {
+				if (keyIsDown(83)) {
 					this.speed += accel;
 				}
 				break;
-			case 1:
+			case 2:
 				if (keyIsDown(UP_ARROW)) {
 					this.speed -= accel;
 				}
 				if (keyIsDown(DOWN_ARROW)) {
 					this.speed += accel;
+				}
+				break;
+			case 0:
+				if (ball.y < this.y - paddleHeight / 2) {
+					this.speed -= accel/1.3;
+				}
+				if (ball.y > this.y + paddleHeight / 2) {
+					this.speed += accel/1.3;
 				}
 				break;
 		}
@@ -162,4 +173,9 @@ function drawWalls() { //this function draws the walls every frame
 	fill(215)
 	rect(0, 0, width, wallWidth);
 	rect(0, height-wallWidth, width, height);
+}
+
+function windowResized() {
+	resizeCanvas(windowWidth, windowHeight);
+	paddleHeight = height / 5;
 }
