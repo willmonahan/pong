@@ -72,11 +72,13 @@ class Ball {
 		//collision for left paddle
 		if (this.x - this.size / 2 < paddleWidth && this.y > paddles[0].y - paddleHeight / 2 && this.y < paddles[0].y + paddleHeight / 2) {
 			this.speedX *= -1;
+			this.x = paddleWidth + this.size / 2;
 		}
 
-		//collision for left paddle
+		//collision for right paddle
 		if (this.x + this.size / 2 > width - paddleWidth && this.y > paddles[1].y - paddleHeight / 2 && this.y < paddles[1].y + paddleHeight / 2) {
 			this.speedX *= -1;
+			this.x = width - paddleWidth - this.size / 2;
 		}
 	}
 
@@ -115,20 +117,28 @@ class Paddle {
 		rect(this.x, this.y, paddleWidth, paddleHeight);
 
 		switch (this.mode) {
-			case 0:
-				if (ball.y < this.y) {
+			case 1:
+				if (keyIsDown(87)) {
 					this.speed -= accel;
 				}
-				if (ball.y > this.y) {
+				if (keyIsDown(83)) {
 					this.speed += accel;
 				}
 				break;
-			case 1:
+			case 2:
 				if (keyIsDown(UP_ARROW)) {
 					this.speed -= accel;
 				}
 				if (keyIsDown(DOWN_ARROW)) {
 					this.speed += accel;
+				}
+				break;
+			case 0:
+				if (ball.y < this.y - paddleHeight / 2) {
+					this.speed -= accel/1.3;
+				}
+				if (ball.y > this.y + paddleHeight / 2) {
+					this.speed += accel/1.3;
 				}
 				break;
 		}
