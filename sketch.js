@@ -1,7 +1,9 @@
 var wallWidth = 20;
 var ballSize = 20;
-
+var totalSpeed = 5;
 var ball;
+
+var gameState = "play";
 
 //these variables are associated with the paddle
 var paddleX = 250;
@@ -25,10 +27,19 @@ function setup() {
 	noStroke();
 	ellipseMode(CENTER);
 	rectMode(CENTER);
+	angleMode(DEGREES);
 	ball = new Ball();
 }
 
 function draw() {
+	switch (gameState) {
+		case "play":
+			gamePlay();
+			break;
+	}
+}
+
+function gamePlay() {
 	background(0);
 	drawWalls();
 	ball.do();
@@ -36,12 +47,16 @@ function draw() {
 
 class Ball {
 	constructor() {
-		this.speedX = random(-3, 3); //this randomizes the X and Y speed of the ball
-		this.speedY = -1 * (5 - Math.abs(this.speedX)); //this statement makes sure the total speed of the ball will add up to an absolute value of 5 (regardless of direction) and that the ball always starts travelling upwards
+		this.totalSpeed = totalSpeed;
+		var angle = random(-60,60);
+		while (angle <= 20 && angle >= -20) {
+			angle = random(-60, 60);
+		}
+		this.speedX = cos(angle) * this.totalSpeed * -1;
+		this.speedY = sin(angle) * this.totalSpeed;
 		this.x = width/2;
 		this.y = height/2;
 		this.size = ballSize;
-		this.totalSpeed = 5;
 	}
 
 	do() {
