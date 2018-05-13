@@ -6,14 +6,15 @@ var totalSpeed; //total speed for the ball
 var ball;
 var paddles = []; //array of paddles
 
-var gameState = "play";
+var gameState = "start";
 
 //these variables are associated with the paddle
 var accel;
 var decel;
 var dir = 0;
 
-var scores = [0,0]
+var scores = [0,0];
+var goalScore = 10;
 
 function preload() { //preload the image
 	// star = loadImage("images/star.png"); //Star by Setyo Ari Wibowo from the Noun Project
@@ -33,16 +34,18 @@ function setup() {
 	rectMode(CENTER);
 	angleMode(DEGREES);
 	textAlign(CENTER, CENTER);
-	ball = new Ball();
-	//TODO: ADD SELECTOR FOR 1/2 PLAYERS HERE TO INITIALIZE PADDLES
-	paddles[0] = new Paddle(1);
-	paddles[1] = new Paddle(0);
 }
 
 function draw() {
 	switch (gameState) {
+		case "start":
+			gameStart();
+			break;
 		case "play":
 			gamePlay();
+			break;
+		case "end":
+			gameEnd();
 			break;
 	}
 }
@@ -57,6 +60,56 @@ function gamePlay() {
 	textSize(32);
 	text(scores[0], 50, paddles[0].y);
 	text(scores[1], width - 50, paddles[1].y);
+
+	if (scores[0] == goalScore || scores[1] == goalScore) {
+		gameState = "end"
+	}
+}
+
+function gameStart() {
+	background(0);
+	drawWalls();
+	rectMode(CENTER);
+
+	fill(255);
+	rect(width/3, height/3, 200, 200);
+	rect(2*width / 3, height / 3, 200, 200);
+
+	fill(0);
+	textSize(32);
+	text("1\nPlayer\n(W,S)", width / 3, height / 3);
+	text("2\nPlayers\n(UP,DOWN)", 2*width / 3, height / 3);
+	fill(255);
+	text("Choose a mode to play", width/2, 2*height/3);
+}
+
+function gameEnd() {
+	gameStart();
+	text(scores[0], 50, height/2);
+	text(scores[1], width - 50, height/2);
+}
+
+function mousePressed() {
+	if (gameState != "play") {
+		if (mouseY >= height / 3 - 100 && mouseY <= height / 3 + 100) {
+			if (mouseX >= width/3 - 100 && mouseX <= width/3 + 100) {
+				console.log("one player");
+				scores = [0,0];
+				paddles[0] = new Paddle(1);
+				paddles[1] = new Paddle(0);
+				ball = new Ball();
+				gameState = "play";
+			}
+			if (mouseX >= 2*width / 3 - 100 && mouseX <= 2*width / 3 + 100) {
+				console.log("two player");
+				scores = [0,0];
+				paddles[0] = new Paddle(1);
+				paddles[1] = new Paddle(2);
+				ball = new Ball();
+				gameState = "play";
+			}
+		}
+	}
 }
 
 class Ball {
@@ -105,7 +158,7 @@ class Ball {
 		while (angle <= 20 && angle >= -20) {
 			angle = random(-60, 60);
 		}
-		var chooseDirection = (random()>=0.5) ? 1 : -1; //TODO: maybe direct this towards the player if in one-player mode
+		var chooseDirection = (random()>=0.5 && paddles[1].mode == 2) ? 1 : -1; //TODO: maybe direct this towards the player if in one-player mode
 		this.speedX = cos(angle) * this.totalSpeed * chooseDirection;
 		this.speedY = sin(angle) * this.totalSpeed;
 		this.x = width / 2;
