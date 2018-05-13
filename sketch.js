@@ -2,19 +2,18 @@ var wallWidth = 20;
 var ballSize = 20;
 var paddleWidth = 16;
 var paddleHeight;
-var totalSpeed = 5;
+var totalSpeed; //total speed for the ball
 var ball;
 var paddles = []; //array of paddles
 
 var gameState = "play";
 
 //these variables are associated with the paddle
-var accel = 0.24;
-var decel = 0.08;
+var accel;
+var decel;
 var dir = 0;
 
-var points = 0;
-var misses = 0;
+var scores = [0,0]
 
 function preload() { //preload the image
 	// star = loadImage("images/star.png"); //Star by Setyo Ari Wibowo from the Noun Project
@@ -26,10 +25,14 @@ function preload() { //preload the image
 function setup() {
 	createCanvas(windowWidth,windowHeight);
 	paddleHeight = height/5;
+	totalSpeed = width/160;
+	accel = width / 3300;
+	decel = accel / 3;
 	noStroke();
 	ellipseMode(CENTER);
 	rectMode(CENTER);
 	angleMode(DEGREES);
+	textAlign(CENTER, CENTER);
 	ball = new Ball();
 	//TODO: ADD SELECTOR FOR 1/2 PLAYERS HERE TO INITIALIZE PADDLES
 	paddles[0] = new Paddle(1);
@@ -51,6 +54,9 @@ function gamePlay() {
 	for (var i = 0; i < paddles.length; i++) {
 		paddles[i].do();
 	}
+	textSize(32);
+	text(scores[0], 50, paddles[0].y);
+	text(scores[1], width - 50, paddles[1].y);
 }
 
 class Ball {
@@ -65,6 +71,11 @@ class Ball {
 		this.y += this.speedY;
 
 		if (this.x < this.size/2 || this.x > width - this.size/2) {
+			if (this.x < this.size/2) {
+				scores[1]++;
+			} else {
+				scores[0]++;
+			}
 			this.setBall();
 		}
 		if (this.y < wallWidth + this.size/2 || this.y > height - wallWidth - this.size/2) {
@@ -73,13 +84,17 @@ class Ball {
 
 		//collision for left paddle
 		if (this.x - this.size / 2 < paddleWidth && this.y > paddles[0].y - paddleHeight / 2 && this.y < paddles[0].y + paddleHeight / 2) {
-			this.speedX *= -1;
+			var angle = (this.y - paddles[0].y) * 70 / (paddleHeight / 2);
+			this.speedY = this.totalSpeed * sin(angle);
+			this.speedX = this.totalSpeed * cos(angle);
 			this.x = paddleWidth + this.size / 2;
 		}
 
 		//collision for right paddle
 		if (this.x + this.size / 2 > width - paddleWidth && this.y > paddles[1].y - paddleHeight / 2 && this.y < paddles[1].y + paddleHeight / 2) {
-			this.speedX *= -1;
+			var angle = (this.y - paddles[1].y) * 70 / (paddleHeight / 2);
+			this.speedY = this.totalSpeed * sin(angle);
+			this.speedX = this.totalSpeed * cos(angle) * -1;
 			this.x = width - paddleWidth - this.size / 2;
 		}
 	}
@@ -138,10 +153,10 @@ class Paddle {
 				break;
 			case 0:
 				if (ball.speedX > 0) {
-					if (ball.y < this.y - paddleHeight / 2) {
+					if (ball.y < this.y - paddleHeight / 3) {
 						this.speed -= accel / 1.3;
 					}
-					if (ball.y > this.y + paddleHeight / 2) {
+					if (ball.y > this.y + paddleHeight / 3) {
 						this.speed += accel / 1.3;
 					}
 				}
@@ -183,3 +198,11 @@ function windowResized() {
 	resizeCanvas(windowWidth, windowHeight);
 	paddleHeight = height / 5;
 }
+
+//preventing scrolling with arrow keys
+window.addEventListener("keydown", function (e) {
+	// space and arrow keys
+	if ([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
+		e.preventDefault();
+	}
+}, false);
