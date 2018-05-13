@@ -5,6 +5,7 @@ var paddleHeight;
 var totalSpeed; //total speed for the ball
 var ball;
 var paddles = []; //array of paddles
+var theCanvas;
 
 var gameState = "start";
 
@@ -24,7 +25,8 @@ function preload() { //preload the image
 }
 
 function setup() {
-	createCanvas(windowWidth,windowHeight);
+	theCanvas = createCanvas(windowWidth,windowHeight);
+	theCanvas.parent("#pongContainer");
 	paddleHeight = height/5;
 	totalSpeed = width/160;
 	accel = width / 3300;
