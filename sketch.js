@@ -31,6 +31,7 @@ function setup() {
 	rectMode(CENTER);
 	angleMode(DEGREES);
 	ball = new Ball();
+	//TODO: ADD SELECTOR FOR 1/2 PLAYERS HERE TO INITIALIZE PADDLES
 	paddles[0] = new Paddle(1);
 	paddles[1] = new Paddle(0);
 }
@@ -89,7 +90,8 @@ class Ball {
 		while (angle <= 20 && angle >= -20) {
 			angle = random(-60, 60);
 		}
-		this.speedX = cos(angle) * this.totalSpeed * -1;
+		var chooseDirection = (random()>=0.5) ? 1 : -1; //TODO: maybe direct this towards the player if in one-player mode
+		this.speedX = cos(angle) * this.totalSpeed * chooseDirection;
 		this.speedY = sin(angle) * this.totalSpeed;
 		this.x = width / 2;
 		this.y = height / 2;
@@ -135,11 +137,13 @@ class Paddle {
 				}
 				break;
 			case 0:
-				if (ball.y < this.y - paddleHeight / 2) {
-					this.speed -= accel/1.3;
-				}
-				if (ball.y > this.y + paddleHeight / 2) {
-					this.speed += accel/1.3;
+				if (ball.speedX > 0) {
+					if (ball.y < this.y - paddleHeight / 2) {
+						this.speed -= accel / 1.3;
+					}
+					if (ball.y > this.y + paddleHeight / 2) {
+						this.speed += accel / 1.3;
+					}
 				}
 				break;
 		}
